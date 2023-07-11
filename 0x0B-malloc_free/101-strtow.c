@@ -26,7 +26,7 @@ int count_word(char *s)
 		}
 	}
 
-	return (w);
+	return w;
 }
 
 /**
@@ -49,7 +49,6 @@ char **strtow(char *str)
 	if (str == NULL || *str == '\0')
 		return NULL;
 
-	len = 0;
 	while (str[len] != '\0')
 		len++;
 
