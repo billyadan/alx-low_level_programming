@@ -26,7 +26,7 @@ int count_word(char *s)
 		}
 	}
 
-	return w;
+	return (w);
 }
 
 /**
@@ -58,7 +58,7 @@ char **strtow(char *str)
 	if (words == 0)
 		return NULL;
 
-	matrix = (char **)malloc(sizeof(char *) * (words + 1));
+	matrix = malloc(sizeof(char *) * (words + 1));
 	if (matrix == NULL)
 		return NULL;
 
@@ -69,7 +69,7 @@ char **strtow(char *str)
 			if (c)
 			{
 				end = i;
-				tmp = (char *)malloc(sizeof(char) * (c + 1));
+				tmp = malloc(sizeof(char) * (c + 1));
 				if (tmp == NULL)
 				{
 					for (i = 0; i < k; i++)
@@ -78,10 +78,10 @@ char **strtow(char *str)
 					return NULL;
 				}
 
-				while (start < end)
-					*tmp++ = str[start++];
-				*tmp = '\0';
-				matrix[k] = tmp - c;
+				for (int j = start; j < end; j++)
+					tmp[j - start] = str[j];
+				tmp[c] = '\0';
+				matrix[k] = tmp;
 				k++;
 				c = 0;
 			}
