@@ -27,28 +27,42 @@ int count_word(char *s)
 }
 
 /**
- * strtow - Split a string into words
- * @str: String to split
+ * copy_word - Helper function to copy a word from the string
+ * @src: Source string to copy from
+ * @start: Starting index of the word
+ * @end: Ending index of the word
  *
- * Return: Pointer to an array of strings (Success) or NULL (Error)
+ * Return: Pointer to the copied word
  */
-char **strtow(char *str)
+char *copy_word(char *src, int start, int end)
 {
-	char **matrix, *tmp;
-	int i, k = 0, len = 0, words, c = 0, start, end;
+	char *word;
+	int i;
+
+	word = malloc(sizeof(char) * (end - start + 1));
+	if (word == NULL)
+		return (NULL);
+
+	for (i = 0; start < end; i++, start++)
+		word[i] = src[start];
+
+	word[i] = '\0';
+
+	return (word);
+}
+
+/**
+ * fill_matrix - Helper function to fill the matrix with words
+ * @matrix: Pointer to the matrix
+ * @str: String to split
+ * @words: Number of words
+ */
+void fill_matrix(char **matrix, char *str, int words)
+{
+	int i, k = 0, len = 0, c = 0, start, end;
 
 	while (*(str + len))
 		len++;
-
-	words = count_word(str);
-
-	if (words == 0)
-		return (NULL);
-
-	matrix = (char **)malloc(sizeof(char *) * (words + 1));
-
-	if (matrix == NULL)
-		return (NULL);
 
 	for (i = 0; i <= len; i++)
 	{
@@ -57,16 +71,16 @@ char **strtow(char *str)
 			if (c)
 			{
 				end = i;
-				tmp = (char *)malloc(sizeof(char) * (c + 1));
+				matrix[k] = copy_word(str, start, end);
 
-				if (tmp == NULL)
-					return (NULL);
+				if (matrix[k] == NULL)
+				{
+					for (i = 0; i < k; i++)
+						free(matrix[i]);
+					free(matrix);
+					return;
+				}
 
-				while (start < end)
-					*tmp++ = str[start++];
-
-				*tmp = '\0';
-				matrix[k] = tmp - c;
 				k++;
 				c = 0;
 			}
@@ -76,6 +90,32 @@ char **strtow(char *str)
 	}
 
 	matrix[k] = NULL;
+}
+
+/**
+ * strtow - Split a string into words
+ * @str: String to split
+ *
+ * Return: Pointer to an array of strings (Success) or NULL (Error)
+ */
+char **strtow(char *str)
+{
+	char **matrix;
+	int words;
+
+	if (str == NULL || *str == '\0')
+		return (NULL);
+
+	words = count_word(str);
+
+	if (words == 0)
+		return (NULL);
+
+	matrix = malloc(sizeof(char *) * (words + 1));
+	if (matrix == NULL)
+		return (NULL);
+
+	fill_matrix(matrix, str, words);
 
 	return (matrix);
 }
