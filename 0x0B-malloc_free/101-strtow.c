@@ -1,95 +1,36 @@
 #include <stdlib.h>
-#include "main.h"
+#include <string.h>
 
 /**
- * count_word - Helper function to count the number of words in a string
- * @s: String to evaluate
+ * count_words - Helper function to count the number of words in a string
+ * @str: String to evaluate
  *
  * Return: Number of words
  */
-int count_word(char *s)
+int count_words(char *str)
 {
-	int flag = 0;
-	int c, w = 0;
+	int count = 0;
+	int word_started = 0;
 
-	for (c = 0; s[c] != '\0'; c++)
+	while (*str)
 	{
-		if (s[c] == ' ')
-			flag = 0;
-		else if (flag == 0)
+		if (*str != ' ')
 		{
-			flag = 1;
-			w++;
-		}
-	}
-
-	return (w);
-}
-
-/**
- * copy_word - Helper function to copy a word from the string
- * @src: Source string to copy from
- * @start: Starting index of the word
- * @end: Ending index of the word
- *
- * Return: Pointer to the copied word
- */
-char *copy_word(char *src, int start, int end)
-{
-	char *word;
-	int i;
-
-	word = malloc(sizeof(char) * (end - start + 1));
-	if (word == NULL)
-		return (NULL);
-
-	for (i = 0; start < end; i++, start++)
-		word[i] = src[start];
-
-	word[i] = '\0';
-
-	return (word);
-}
-
-/**
- * fill_matrix - Helper function to fill the matrix with words
- * @matrix: Pointer to the matrix
- * @str: String to split
- * @words: Number of words
- */
-void fill_matrix(char **matrix, char *str, int words)
-{
-	int i, k = 0, len = 0, c = 0, start, end;
-
-	while (*(str + len))
-		len++;
-
-	for (i = 0; i <= len; i++)
-	{
-		if (str[i] == ' ' || str[i] == '\0')
-		{
-			if (c)
+			if (word_started == 0)
 			{
-				end = i;
-				matrix[k] = copy_word(str, start, end);
-
-				if (matrix[k] == NULL)
-				{
-					for (i = 0; i < k; i++)
-						free(matrix[i]);
-					free(matrix);
-					return;
-				}
-
-				k++;
-				c = 0;
+				word_started = 1;
+				count++;
 			}
 		}
-		else if (c++ == 0)
-			start = i;
+		else
+		{
+			word_started = 0;
+		}
+
+		str++;
 	}
 
-	matrix[k] = NULL;
+	return count;
 }
 
 /**
@@ -100,22 +41,77 @@ void fill_matrix(char **matrix, char *str, int words)
  */
 char **strtow(char *str)
 {
-	char **matrix;
-	int words;
-
 	if (str == NULL || *str == '\0')
-		return (NULL);
+		return NULL;
 
-	words = count_word(str);
+	int word_count = count_words(str);
 
-	if (words == 0)
-		return (NULL);
+	if (word_count == 0)
+		return NULL;
 
-	matrix = malloc(sizeof(char *) * (words + 1));
-	if (matrix == NULL)
-		return (NULL);
+	char **words = malloc(sizeof(char *) * (word_count + 1));
 
-	fill_matrix(matrix, str, words);
+	if (words == NULL)
+		return NULL;
 
-	return (matrix);
+	int word_index = 0;
+	int word_started = 0;
+	char *word_start = NULL;
+
+	while (*str)
+	{
+		if (*str != ' ')
+		{
+			if (word_started == 0)
+			{
+				word_started = 1;
+				word_start = str;
+			}
+		}
+		else
+		{
+			if (word_started == 1)
+			{
+				word_started = 0;
+				int word_length = str - word_start;
+				words[word_index] = malloc(sizeof(char) * (word_length + 1));
+
+				if (words[word_index] == NULL)
+				{
+					for (int i = 0; i < word_index; i++)
+						free(words[i]);
+					free(words);
+					return NULL;
+				}
+
+				strncpy(words[word_index], word_start, word_length);
+				words[word_index][word_length] = '\0';
+				word_index++;
+			}
+		}
+
+		str++;
+	}
+
+	if (word_started == 1)
+	{
+		int word_length = str - word_start;
+		words[word_index] = malloc(sizeof(char) * (word_length + 1));
+
+		if (words[word_index] == NULL)
+		{
+			for (int i = 0; i <= word_index; i++)
+				free(words[i]);
+			free(words);
+			return NULL;
+		}
+
+		strncpy(words[word_index], word_start, word_length);
+		words[word_index][word_length] = '\0';
+		word_index++;
+	}
+
+	words[word_index] = NULL;
+
+	return words;
 }
