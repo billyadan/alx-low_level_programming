@@ -2,14 +2,18 @@
 #include "main.h"
 
 /**
- * count_word - Helper function to count the number of words in a string
+ * count_word - Count the number of words in a string
  * @s: String to evaluate
  *
  * Return: Number of words
+ *
+ * Description: This function counts the number of words in a string.
+ * A word is defined as a sequence of non-space characters separated by spaces.
  */
 int count_word(char *s)
 {
-	int flag = 0, c, w = 0;
+	int flag = 0;
+	int c, w = 0;
 
 	for (c = 0; s[c] != '\0'; c++)
 	{
@@ -22,7 +26,7 @@ int count_word(char *s)
 		}
 	}
 
-	return (w);
+	return w;
 }
 
 /**
@@ -30,24 +34,33 @@ int count_word(char *s)
  * @str: String to split
  *
  * Return: Pointer to an array of strings (Success) or NULL (Error)
+ *
+ * Description: This function splits a string into individual words.
+ * It allocates memory for the words and stores them in an array of strings.
+ * The words are separated by spaces, and the last element of the array is NULL.
+ * If the input string is NULL or empty, or if memory allocation fails, NULL is returned.
  */
 char **strtow(char *str)
 {
-	char **matrix, *tmp;
+	char **matrix;
+	char *tmp;
 	int i, k = 0, len = 0, words, c = 0, start, end;
 
-	while (*(str + len))
+	if (str == NULL || *str == '\0')
+		return NULL;
+
+	len = 0;
+	while (str[len] != '\0')
 		len++;
 
 	words = count_word(str);
 
 	if (words == 0)
-		return (NULL);
+		return NULL;
 
 	matrix = (char **)malloc(sizeof(char *) * (words + 1));
-
 	if (matrix == NULL)
-		return (NULL);
+		return NULL;
 
 	for (i = 0; i <= len; i++)
 	{
@@ -57,13 +70,16 @@ char **strtow(char *str)
 			{
 				end = i;
 				tmp = (char *)malloc(sizeof(char) * (c + 1));
-
 				if (tmp == NULL)
-					return (NULL);
+				{
+					for (i = 0; i < k; i++)
+						free(matrix[i]);
+					free(matrix);
+					return NULL;
+				}
 
 				while (start < end)
 					*tmp++ = str[start++];
-
 				*tmp = '\0';
 				matrix[k] = tmp - c;
 				k++;
@@ -76,5 +92,5 @@ char **strtow(char *str)
 
 	matrix[k] = NULL;
 
-	return (matrix);
+	return matrix;
 }
