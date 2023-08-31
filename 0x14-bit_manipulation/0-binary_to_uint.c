@@ -1,20 +1,22 @@
 #include "main.h"
 
-unsigned int binary_to_uint(const char *b)
+void print_binary(unsigned long int n)
 {
-  int i;
-  unsigned int dec_val = 0;
+	int i, count = 0;
+	unsigned long int current;
 
-  for (i = 0; b[i]; i++) 
-  {
-   	 if (b[i] == '0') {
-      	continue;
-    } else if (b[i] == '1') {
-      dec_val = dec_val * 2 + 1;
-    } else {
-      return 0;
-    }
-  }
+	for (i = 63; i >= 0; i--)
+	{
+		current = n >> i;
 
-  return dec_val;
+		if (current & 1)
+		{
+			_putchar('1');
+			count++;
+		}
+		else if (count)
+			_putchar('0');
+	}
+	if (!count)
+		_putchar('0');
 }
